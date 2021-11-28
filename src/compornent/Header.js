@@ -1,50 +1,48 @@
-import React from 'react';
-import * as Apii from "../service/apii"
-import { ListItem, ListItemText,ListItemSecondaryAction , IconButton, } from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
+import React, { useContext } from "react";
+import dig from "object-dig"
+import { AuthContext } from "../providers/Auth.Provider";
+import {signWithGoogle, logOut} from "../service/firebase"
 import { makeStyles } from  "@mui/styles";
+import  Button  from "@mui/material/Button";
+import AppBar from "@mui/material/AppBar";
+import Typography from "@mui/material/Typography";
+import Toolbar from "@mui/material/Toolbar";
 
-
-const useStyles = makeStyles(() =>  ({
-    root: {
-        maxWidth: 360,
-        margin: 'auto',
-    },
-    list: {
-        justifyContent: 'space-between',
-    },
-
-    
+const useStyles = makeStyles (()=>({
+  toolbar: {
+      justifyContent: 'space-between'
+  },
+  button: {
+      color: '#FFF'
+  }
 }))
 
 
-const RefectList = (props) => {
-    const classes= useStyles();
-    const DeleteHle= (id) =>{
-        Apii.refectDelete(id)
-        props.fh();
-    }
-    const refectList = props.texts.map((point) =>{
-        return (
-            <ListItem key={point.id}>
-            <ListItemText primary={point.text}/>
-            <ListItemSecondaryAction>
-            <IconButton edg="end" aria-label="delete" onClick={() => DeleteHle(point.id)}>
-                  <DeleteIcon/>
-            </IconButton>
-            </ListItemSecondaryAction>
-      </ListItem>  
-         
-        )
-    })
-   
 
+function Header ()  {
+  const currentUser = useContext(AuthContext);
 
+  const buttonDsiplay = () => {
+      let buttonEl
+      if( dig(currentUser, 'currentUser','uid')){
+        //ログインしていた場合
+          buttonEl = <Button className={classes.button} variant='inherit' onClick={logOut}>Logout</Button>
+      }else{
+        //もしログインしていなかったら
+          buttonEl = <Button className={classes.button} variant='inherit' onClick={signWithGoogle}>Login</Button>
+      }
+      return buttonEl
+  }
+    const classes = useStyles();
     return(
-        <div className={classes.root}>
-            <ul>{refectList}</ul>
-        </div>
+        <AppBar position="static">
+            <Toolbar className={classes.toolbar}>
+              <Typography variant="h6">
+                 ToDoアプリ
+              </Typography>
+              {buttonDsiplay()}
+            </Toolbar>
+        </AppBar>
     )
-    
 }
-export default RefectList
+export default Header;
